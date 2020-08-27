@@ -111,3 +111,31 @@ Hamlet: $330.00 (10 seats)\n\
 Amount owed is $330.00\n\
 You earned 2 credits \n');
 });
+
+test('should return correct statement \
+when statement \
+given playType is tragedy and audience is 20', t => {
+  //given
+  let invoice = {
+    'customer': 'BigCo',
+    'performances': [
+      {
+        'playID': 'hamlet',
+        'audience': 20,
+      }
+    ],
+  };
+  let plays = {
+    'hamlet': {
+      'name': 'Hamlet',
+      'type': 'tragedy',
+    },
+  };
+
+  const result = statement(invoice, plays);
+
+  t.is(result, 'Statement for BigCo\n \
+Hamlet: $400.00 (20 seats)\n\
+Amount owed is $400.00\n\
+You earned 0 credits \n');
+});
