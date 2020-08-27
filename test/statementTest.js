@@ -29,3 +29,30 @@ Amount owed is $500.00\n\
 You earned 10 credits \n');
 });
 
+test('should return correct statement \
+when statement \
+given playType is comedy and audience is 40', t => {
+  //given
+  let invoice = {
+    'customer': 'BigCo',
+    'performances': [
+      {
+        'playID': 'hamlet',
+        'audience': 40,
+      }
+    ],
+  };
+  let plays = {
+    'hamlet': {
+      'name': 'Hamlet',
+      'type': 'comedy',
+    },
+  };
+
+  const result = statement(invoice, plays);
+
+  t.is(result, 'Statement for BigCo\n \
+Hamlet: $620.00 (40 seats)\n\
+Amount owed is $620.00\n\
+You earned 18 credits \n');
+});
