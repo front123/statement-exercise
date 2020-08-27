@@ -1,6 +1,6 @@
 const { PlayType } = require('./constant');
 
-function tragedyTypeComputeAmount(perf){
+function tragedyTypeComputeAmount(perf) {
   let thisAmount = 40000;
   if (perf.audience > 30) {
     thisAmount += 1000 * (perf.audience - 30);
@@ -8,7 +8,7 @@ function tragedyTypeComputeAmount(perf){
   return thisAmount;
 }
 
-function comedyTypeComputeAmount(perf){
+function comedyTypeComputeAmount(perf) {
   thisAmount = 30000;
   if (perf.audience > 20) {
     thisAmount += 10000 + 500 * (perf.audience - 20);
@@ -17,7 +17,22 @@ function comedyTypeComputeAmount(perf){
   return thisAmount;
 }
 
-function statement (invoice, plays) {
+function computeAmount(playType, perf) {
+  let thisAmount = 0;
+  switch (playType) {
+    case PlayType.TRAGEDY:
+      thisAmount = tragedyTypeComputeAmount(perf);
+      break;
+    case PlayType.COMEDY:
+      thisAmount = comedyTypeComputeAmount(perf);
+      break;
+    default:
+      throw new Error(`unknown type: ${playType}`);
+  }
+  return thisAmount;
+}
+
+function statement(invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
@@ -28,17 +43,7 @@ function statement (invoice, plays) {
   }).format;
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
-    let thisAmount = 0;
-    switch (play.type) {
-      case PlayType.TRAGEDY:
-        thisAmount = tragedyTypeComputeAmount(perf);
-        break;
-      case PlayType.COMEDY:
-        thisAmount = comedyTypeComputeAmount(perf);
-        break;
-      default:
-        throw new Error(`unknown type: ${play.type}`);
-    }
+    let thisAmount = computeAmount(play.type, perf);
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
     // add extra credit for every ten comedy attendees
