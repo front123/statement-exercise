@@ -50,35 +50,51 @@ function addCredits(audience, playType){
   return credits;
 }
 
-function generateNormalStatement(invoice, plays){
+function buildStatementData(invoice, plays){
+  let details = [];
   let totalAmount = 0;
   let volumeCredits = 0;
-  let result = `Statement for ${invoice.customer}\n`;
-  for (let perf of invoice.performances) {
+  let customer = invoice.customer;
+  invoice.performances.map(perf => {
     const play = plays[perf.playID];
     let thisAmount = computeAmount(play.type, perf);
-    volumeCredits += addCredits(perf.audience, play.type);
-    result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
+    let volumeCredit = addCredits(perf.audience, play.type);
     totalAmount += thisAmount;
+    volumeCredits += volumeCredit;
+    details.push({
+      playName: play.name,
+      audience: perf.audience,
+      thisAmount,
+      volumeCredit
+    })
+  })
+  return {
+    customer,
+    totalAmount,
+    volumeCredits,
+    details
   }
-  result += `Amount owed is ${format(totalAmount / 100)}\n`;
-  result += `You earned ${volumeCredits} credits \n`;
+}
+
+function generateNormalStatement(invoice, plays){
+  let data = buildStatementData(invoice, plays);
+  let result = `Statement for ${data.customer}\n`;
+  for (let detail of data.details) {
+    result += ` ${detail.playName}: ${format(detail.thisAmount / 100)} (${detail.audience} seats)\n`;
+  }
+  result += `Amount owed is ${format(data.totalAmount / 100)}\n`;
+  result += `You earned ${data.volumeCredits} credits \n`;
   return result;
 }
 
 function generateHtmlStatement(invoice, plays){
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  let result = `<h1>Statement for ${invoice.customer}</h1>\n<table>\n<tr><th>play</th><th>seats</th><th>cost</th></tr>`;
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = computeAmount(play.type, perf);
-    volumeCredits += addCredits(perf.audience, play.type);
-    result += `<tr><td>${play.name}</td><td>${perf.audience}</td><td>${format(thisAmount / 100)}</td></tr>\n`;
-    totalAmount += thisAmount;
+  let data = buildStatementData(invoice, plays);
+  let result = `<h1>Statement for ${data.customer}</h1>\n<table>\n<tr><th>play</th><th>seats</th><th>cost</th></tr>`;
+  for (let detail of data.details) {
+    result += `<tr><td>${detail.playName}</td><td>${detail.audience}</td><td>${format(detail.thisAmount / 100)}</td></tr>\n`;
   }
-  result += `</table>\n<p>Amount owed is <em>${format(totalAmount / 100)}</em></p>\n`;
-  result += `<p>You earned <em>${volumeCredits}</em> credits</p>\n`;
+  result += `</table>\n<p>Amount owed is <em>${format(data.totalAmount / 100)}</em></p>\n`;
+  result += `<p>You earned <em>${data.volumeCredits}</em> credits</p>\n`;
   return result;
   
 }

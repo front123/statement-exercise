@@ -186,5 +186,4 @@ test('should return correct html statement when htmlStatement given', t=>{
     '</table>\n' +
     '<p>Amount owed is <em>$1,730.00</em></p>\n' +
     '<p>You earned <em>47</em> credits</p>\n');
-
 })
