@@ -1,4 +1,5 @@
 const { PlayType } = require('./constant');
+const format = createNumberFormat();
 
 function tragedyTypeComputeAmount(perf) {
   let thisAmount = 40000;
@@ -49,22 +50,24 @@ function addCredits(audience, playType){
   return credits;
 }
 
-function statement(invoice, plays) {
+function generateNormalStatement(invoice, plays){
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
-  const format = createNumberFormat();
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
     let thisAmount = computeAmount(play.type, perf);
     volumeCredits += addCredits(perf.audience, play.type);
-    //print line for this order
     result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
     totalAmount += thisAmount;
   }
   result += `Amount owed is ${format(totalAmount / 100)}\n`;
   result += `You earned ${volumeCredits} credits \n`;
   return result;
+}
+
+function statement(invoice, plays) {
+  return generateNormalStatement(invoice, plays);
 }
 
 module.exports = {
