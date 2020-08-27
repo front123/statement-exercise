@@ -66,10 +66,32 @@ function generateNormalStatement(invoice, plays){
   return result;
 }
 
+function generateHtmlStatement(invoice, plays){
+  let totalAmount = 0;
+  let volumeCredits = 0;
+  let result = `<h1>Statement for ${invoice.customer}</h1>\n<table>\n<tr><th>play</th><th>seats</th><th>cost</th></tr>`;
+  for (let perf of invoice.performances) {
+    const play = plays[perf.playID];
+    let thisAmount = computeAmount(play.type, perf);
+    volumeCredits += addCredits(perf.audience, play.type);
+    result += `<tr><td>${play.name}</td><td>${perf.audience}</td><td>${format(thisAmount / 100)}</td></tr>\n`;
+    totalAmount += thisAmount;
+  }
+  result += `</table>\n<p>Amount owed is <em>${format(totalAmount / 100)}</em></p>\n`;
+  result += `<p>You earned <em>${volumeCredits}</em> credits</p>\n`;
+  return result;
+  
+}
+
 function statement(invoice, plays) {
   return generateNormalStatement(invoice, plays);
 }
 
+function htmlStatement(invoice, plays) {
+  return generateHtmlStatement(invoice, plays);
+}
+
 module.exports = {
   statement,
+  htmlStatement
 };
