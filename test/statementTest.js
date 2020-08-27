@@ -83,3 +83,31 @@ given unknown type', t => {
     t.is(error.message, 'unknown type: helloworld');
   }
 });
+
+test('should return correct statement \
+when statement \
+given playType is comedy and audience is 10', t => {
+  //given
+  let invoice = {
+    'customer': 'BigCo',
+    'performances': [
+      {
+        'playID': 'hamlet',
+        'audience': 10,
+      }
+    ],
+  };
+  let plays = {
+    'hamlet': {
+      'name': 'Hamlet',
+      'type': 'comedy',
+    },
+  };
+
+  const result = statement(invoice, plays);
+
+  t.is(result, 'Statement for BigCo\n \
+Hamlet: $330.00 (10 seats)\n\
+Amount owed is $330.00\n\
+You earned 2 credits \n');
+});
