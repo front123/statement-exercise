@@ -56,3 +56,30 @@ Hamlet: $620.00 (40 seats)\n\
 Amount owed is $620.00\n\
 You earned 18 credits \n');
 });
+
+test('should return error message \
+when statement \
+given unknown type', t => {
+  //given
+  let invoice = {
+    'customer': 'BigCo',
+    'performances': [
+      {
+        'playID': 'hamlet',
+        'audience': 40,
+      }
+    ],
+  };
+  let plays = {
+    'hamlet': {
+      'name': 'Hamlet',
+      'type': 'helloworld',
+    },
+  };
+
+  try {
+    statement(invoice, plays);
+  } catch (error) {
+    t.is(error.message, 'unknown type: helloworld');
+  }
+});
